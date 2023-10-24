@@ -40,7 +40,7 @@ describe('AppController', () => {
     const mockData = { cities_population: [], city_members: [] };
     appService.getAggregatedData = jest.fn().mockResolvedValueOnce(mockData);
     const req = { some: 'request' };
-    const res = { send: jest.fn() };
+    const res = { send: jest.fn(), status: jest.fn()  };
     await appController.getAggregatedData(req, res);
     expect(appService.getAggregatedData).toHaveBeenCalled();
     expect(res.send).toHaveBeenCalledWith(mockData);

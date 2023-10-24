@@ -1,24 +1,47 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { AppController } from '../src/app.controller';
+import { AppService } from '../src/app.service';
+import { DataPopulationService } from '../src/database/dataSeeder.service';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication;
+describe('AppController', () => {
+  let appController: AppController;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+    const app: TestingModule = await Test.createTestingModule({
+      controllers: [AppController],
+      providers: [AppService, DataPopulationService],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    appController = app.get<AppController>(AppController);
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('getAggregatedData', () => {
+    it('should return aggregated data', async () => {
+      const result = {};
+      expect(await appController.getAggregatedData({}, {
+        send: (data) => {
+          expect(data).toEqual(result);
+        },
+        status: (code) => {
+          expect(code).toBe(200);
+          return { send: () => {} };
+        },
+      }));
+    });
+  });
+
+  describe('populateData', () => {
+    it('should populate data', async () => {
+      const result = 'Data population successful!';
+      expect(await appController.populateData({
+        send: (data) => {
+          expect(data).toBe(result);
+        },
+        status: (code) => {
+          expect(code).toBe(200);
+          return { send: () => {} };
+        },
+      }));
+    });
   });
 });
